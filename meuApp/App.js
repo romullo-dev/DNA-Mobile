@@ -7,7 +7,7 @@ export default function App() {
   const [senha, setSenha] = useState("");
 
   const handleLogin = () => {
-    // aqui vai a lógica de autenticação futuramente (chamada pra API Laravel)
+    
     alert(`Email: ${email}\nSenha: ${senha}`);
   };
 
@@ -29,6 +29,7 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Digite sua senha"
+          keyboardType="visible-password"
           placeholderTextColor="#aaa"
           secureTextEntry
           value={senha}
