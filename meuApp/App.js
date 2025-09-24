@@ -6,10 +6,22 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = () => {
-    
-    alert(`Email: ${email}\nSenha: ${senha}`);
-  };
+ const handleLogin = async () => {
+  try {
+    // Faz a requisição GET para a sua API
+    const response = await fetch("http://127.0.0.1:8000/api/usuarios");
+    const data = await response.json();
+
+    console.log("Usuários recebidos:", data);
+
+    // Exemplo: mostrar no alert só o primeiro usuário
+    if (data.length > 0) {
+      alert(`Primeiro usuário: ${data[0].nome} - ${data[0].email}`);
+    }
+  } catch (error) {
+    console.error("Erro ao buscar usuários:", error);
+  }
+};
 
   return (
     <View style={styles.container}>
