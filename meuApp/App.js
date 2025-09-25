@@ -3,25 +3,36 @@ import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-nativ
 import { useState } from "react";
 
 export default function App() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
 
- const handleLogin = async () => {
-  try {
-    // Faz a requisição GET para a sua API
-    const response = await fetch("http://127.0.0.1:8000/api/usuarios");
-    const data = await response.json();
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://172.20.10.3:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: user,   // ou "user" dependendo de como você vai usar
+          password: password,
+        }),
+      });
 
-    console.log("Usuários recebidos:", data);
+      const data = await response.json();
 
-    // Exemplo: mostrar no alert só o primeiro usuário
-    if (data.length > 0) {
-      alert(`Primeiro usuário: ${data[0].nome} - ${data[0].email}`);
+      if (data.success) {
+        alert(`Bem-vindo ${data.user.nome}`);
+        // Aqui você pode salvar o user/token no AsyncStorage
+      } else {
+        alert("Usuário ou senha inválidos");
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
+      alert("Erro de conexão com servidor");
     }
-  } catch (error) {
-    console.error("Erro ao buscar usuários:", error);
-  }
-};
+  };
+
 
   return (
     <View style={styles.container}>
@@ -34,8 +45,8 @@ export default function App() {
           placeholderTextColor="#aaa"
           keyboardType="email-address"
           autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
+          value={user}
+          onChangeText={setUser}
         />
 
         <TextInput
@@ -44,8 +55,8 @@ export default function App() {
           keyboardType="visible-password"
           placeholderTextColor="#aaa"
           secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
+          value={password}
+          onChangeText={setPassword}
         />
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
