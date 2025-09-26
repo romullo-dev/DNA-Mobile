@@ -1,118 +1,19 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Login from "./Login";
+import Home from "./app/home";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [user, setUser] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch("http://172.20.10.3:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: user,   // ou "user" dependendo de como você vai usar
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(`Bem-vindo ${data.user.nome}`);
-        // Aqui você pode salvar o user/token no AsyncStorage
-      } else {
-        alert("Usuário ou senha inválidos");
-      }
-    } catch (error) {
-      console.error("Erro no login:", error);
-      alert("Erro de conexão com servidor");
-    }
-  };
-
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>DNA Transportes</Text>
-
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu e-mail"
-          placeholderTextColor="#aaa"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={user}
-          onChangeText={setUser}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          keyboardType="visible-password"
-          placeholderTextColor="#aaa"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity>
-          <Text style={styles.link}>Esqueceu a senha?</Text>
-        </TouchableOpacity>
-      </View>
-
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
       <StatusBar style="light" />
-    </View>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0A0F2C", // fundo azul escuro profissional
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  logo: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 40,
-  },
-  form: {
-    width: "100%",
-  },
-  input: {
-    backgroundColor: "#1E2749",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    color: "#fff",
-  },
-  button: {
-    backgroundColor: "#2ECC71", // verde pra dar destaque
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    color: "#2ECC71",
-    textAlign: "center",
-  },
-});
-
