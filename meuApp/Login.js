@@ -9,17 +9,18 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://172.20.10.3:8000/api/login", {
+      const response = await fetch("http://192.168.1.27:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user, password }),
       });
 
+      
       const data = await response.json();
 
       if (data.success) {
         alert(`Bem-vindo ${data.user.nome}`);
-        navigation.replace("Home"); 
+        navigation.replace("Home");
       } else {
         alert("Usuário ou senha inválidos");
       }
