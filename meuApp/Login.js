@@ -9,26 +9,35 @@ export default function Login() {
   const navigation = useNavigation();
 
   const handleLogin = async () => {
+  try {
+    const response = await fetch("http://192.168.1.32:8000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user, password }),
+    });
+
+    const text = await response.text();
+    console.log("RESPOSTA:", text); 
+    let data;
     try {
-      const response = await fetch("http://172.20.10.3:8000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(`Bem-vindo ${data.user.nome}`);
-        navigation.replace("Home");
-      } else {
-        alert("Usuário ou senha inválidos");
-      }
-    } catch (error) {
-      console.error("Erro no login:", error);
-      alert("Erro de conexão com servidor");
+      data = JSON.parse(text);
+    } catch {
+      alert("O servidor não devolveu JSON. Veja o console para detalhes.");
+      return;
     }
-  };
+
+    if (data.success) {
+      alert(`Bem-vindo ${data.user.nome}`);
+      navigation.replace("Home");
+    } else {
+      alert(data.message || "Usuário ou senha inválidos");
+    }
+  } catch (error) {
+    console.error("Erro no login:", error);
+    alert("Erro de conexão com o servidor");
+  }
+};
+
 
   return (
     <View style={styles.container}>

@@ -9,7 +9,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     const fetchRotas = async () => {
       try {
-        const response = await fetch('http://172.20.10.3:8000/api/rotas'); // A URL da sua API
+        const response = await fetch('http://192.168.1.32:8000/api/rotas'); // A URL da sua API
         const data = await response.json();
         setRotas(data.data);
       } catch (error) {
