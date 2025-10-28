@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://172.20.10.3:8000/api";
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://72.60.2.222:8080/api";
 
 export const endpoints = {
   login: `${API_BASE_URL}/login`,
