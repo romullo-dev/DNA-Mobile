@@ -25,7 +25,7 @@ const STATUS_MAP = {
 };
 
 export default function EditarRota({ route, navigation }) {
-  const { rota } = route.params;
+  const { rota, onUpdate } = route.params;
   const [statusOpen, setStatusOpen] = useState(false);
   const statusOptions = useMemo(() => STATUS_MAP[rota.tipo] ?? STATUS_MAP.Entrega, [rota.tipo]);
 
@@ -40,11 +40,9 @@ export default function EditarRota({ route, navigation }) {
   const [foto, setFoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    setStatus(statusInicial);
-  }, [statusInicial]);
+  useEffect(() => setStatus(statusInicial), [statusInicial]);
 
-  // 📸 Selecionar imagem (galeria ou câmera)
+  // 📸 Selecionar imagem
   const pickImage = async (fromCamera = false) => {
     try {
       const permission = await (fromCamera
@@ -58,11 +56,11 @@ export default function EditarRota({ route, navigation }) {
 
       const result = await (fromCamera
         ? ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: [ImagePicker.MediaType.Image],
             quality: 0.7,
           })
         : ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: [ImagePicker.MediaType.Image],
             quality: 0.7,
           }));
 
@@ -89,7 +87,6 @@ export default function EditarRota({ route, navigation }) {
             formData.append("status", status);
             formData.append("observacao", observacao);
 
-            // Adiciona a imagem, se existir
             if (foto) {
               const uri = foto.uri;
               const name = uri.split("/").pop();
@@ -103,7 +100,15 @@ export default function EditarRota({ route, navigation }) {
               });
             }
 
-            // Envia ao backend
+            console.log("📤 Enviando dados:", {
+              pedido_id_pedido: rota.pedidos?.[0]?.id_pedido,
+              rotas_id_rotas: rota.id_rotas,
+              tipo: rota.tipo,
+              status,
+              observacao,
+              foto: !!foto,
+            });
+
             const response = await fetch(endpoints.historico, {
               method: "POST",
               headers: { Accept: "application/json" },
@@ -122,10 +127,28 @@ export default function EditarRota({ route, navigation }) {
               throw new Error(data?.message ?? "Não foi possível atualizar a rota");
             }
 
+            console.log("✅ Resposta da API:", data);
+
+            // 🔄 Atualiza a rota no retorno da tela anterior
+            if (onUpdate) {
+              const novoHistorico = {
+                id_historico: Date.now(),
+                data: new Date().toISOString(),
+                status,
+                observacao,
+                foto: foto ? foto.uri.split("/").pop() : null,
+              };
+              const novaRota = {
+                ...rota,
+                historicos: [...(rota.historicos || []), novoHistorico],
+              };
+              onUpdate(novaRota);
+            }
+
             Alert.alert("✅ Sucesso", data.message ?? "Rota atualizada com sucesso!");
             navigation.goBack();
           } catch (error) {
-            console.error("Erro ao salvar rota", error);
+            console.error("❌ Erro ao salvar rota:", error);
             Alert.alert("Erro", error.message ?? "Falha ao salvar alterações.");
           } finally {
             setSubmitting(false);
@@ -136,108 +159,99 @@ export default function EditarRota({ route, navigation }) {
   };
 
   return (
-  <SafeAreaView style={styles.safeArea}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <View style={styles.innerContainer}>
-          {/* Botão Fechar */}
-          <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-            <FontAwesome5 name="times" size={18} color="#FFFFFF" />
-          </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.innerContainer}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+              <FontAwesome5 name="times" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
 
-          {/* Cabeçalho */}
-          <Text style={styles.title}>Atualizar Rota #{rota.id_rotas}</Text>
-          <Text style={styles.subtitle}>
-            Informe o novo status e adicione evidências, se necessário.
-          </Text>
+            <Text style={styles.title}>Atualizar Rota #{rota.id_rotas}</Text>
+            <Text style={styles.subtitle}>
+              Informe o novo status e adicione evidências, se necessário.
+            </Text>
 
-          {/* Campo Status */}
-          <Text style={styles.label}>Status</Text>
-          <DropDownPicker
-            open={statusOpen}
-            value={status}
-            items={statusOptions.map((option) => ({ label: option, value: option }))}
-            setOpen={setStatusOpen}
-            setValue={(callback) => {
-              const nextValue = typeof callback === "function" ? callback(status) : callback;
-              setStatus(nextValue);
-            }}
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-            textStyle={styles.dropdownText}
-            placeholder="Selecione o status"
-            zIndex={9999} // evita que o dropdown fique atrás dos outros componentes
-          />
+            <Text style={styles.label}>Status</Text>
+            <DropDownPicker
+              open={statusOpen}
+              value={status}
+              items={statusOptions.map((option) => ({ label: option, value: option }))}
+              setOpen={setStatusOpen}
+              setValue={(callback) => {
+                const nextValue = typeof callback === "function" ? callback(status) : callback;
+                setStatus(nextValue);
+              }}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              textStyle={styles.dropdownText}
+              placeholder="Selecione o status"
+              zIndex={9999}
+            />
 
-          {/* Campo Observação */}
-          <Text style={styles.label}>Observação</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={observacao}
-            onChangeText={setObservacao}
-            placeholder="Descreva detalhes importantes da ocorrência"
-            placeholderTextColor="#7D89C6"
-            multiline
-          />
+            <Text style={styles.label}>Observação</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={observacao}
+              onChangeText={setObservacao}
+              placeholder="Descreva detalhes importantes da ocorrência"
+              placeholderTextColor="#7D89C6"
+              multiline
+            />
 
-          {/* Campo Foto */}
-          <Text style={styles.label}>Foto</Text>
-          {foto ? (
-            <View style={styles.previewContainer}>
-              <Image source={{ uri: foto.uri }} style={styles.preview} />
-              <TouchableOpacity style={styles.clearButton} onPress={() => setFoto(null)}>
-                <FontAwesome5 name="trash" size={14} color="#FF6B6B" />
-                <Text style={styles.clearButtonText}>Remover</Text>
+            <Text style={styles.label}>Foto</Text>
+            {foto ? (
+              <View style={styles.previewContainer}>
+                <Image source={{ uri: foto.uri }} style={styles.preview} />
+                <TouchableOpacity style={styles.clearButton} onPress={() => setFoto(null)}>
+                  <FontAwesome5 name="trash" size={14} color="#FF6B6B" />
+                  <Text style={styles.clearButtonText}>Remover</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <Text style={styles.helperText}>
+                Adicione uma foto como comprovante (opcional).
+              </Text>
+            )}
+
+            <View style={styles.photoActions}>
+              <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(false)}>
+                <FontAwesome5 name="images" size={16} color="#08DF74" />
+                <Text style={styles.secondaryButtonText}>Galeria</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(true)}>
+                <FontAwesome5 name="camera" size={16} color="#08DF74" />
+                <Text style={styles.secondaryButtonText}>Câmera</Text>
               </TouchableOpacity>
             </View>
-          ) : (
-            <Text style={styles.helperText}>
-              Adicione uma foto como comprovante (opcional).
-            </Text>
-          )}
 
-          {/* Botões de Foto */}
-          <View style={styles.photoActions}>
-            <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(false)}>
-              <FontAwesome5 name="images" size={16} color="#08DF74" />
-              <Text style={styles.secondaryButtonText}>Galeria</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(true)}>
-              <FontAwesome5 name="camera" size={16} color="#08DF74" />
-              <Text style={styles.secondaryButtonText}>Câmera</Text>
+            <TouchableOpacity
+              style={[styles.primaryButton, submitting && styles.primaryButtonDisabled]}
+              onPress={handleSalvar}
+              disabled={submitting}
+            >
+              <Text style={styles.primaryButtonText}>
+                {submitting ? "Enviando..." : "Salvar atualizações"}
+              </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Botão Salvar */}
-          <TouchableOpacity
-            style={[styles.primaryButton, submitting && styles.primaryButtonDisabled]}
-            onPress={handleSalvar}
-            disabled={submitting}
-          >
-            <Text style={styles.primaryButtonText}>
-              {submitting ? "Enviando..." : "Salvar atualizações"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </SafeAreaView>
-);
-
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#050B2E" },
-  container: { flex: 1 },
-  scrollContent: { padding: 24, paddingBottom: 48 ,paddingTop: 40,},
+  scrollContent: { padding: 24, paddingBottom: 48, paddingTop: 40 },
   closeButton: {
     alignSelf: "flex-end",
     backgroundColor: "rgba(255,255,255,0.08)",
@@ -277,7 +291,6 @@ const styles = StyleSheet.create({
   helperText: { color: "#7D89C6", marginBottom: 12 },
   clearButton: {
     marginTop: 10,
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -311,10 +324,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 0.6,
   },
-  innerContainer: {
-  flexGrow: 1,
-  justifyContent: "flex-start",
-  paddingBottom: 60,
-},
-
+  innerContainer: { flexGrow: 1, justifyContent: "flex-start", paddingBottom: 60 },
 });

@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://72.60.2.222:8080/api";
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://www.dnatransportes.shop/api";
 
 export const endpoints = {
   login: `${API_BASE_URL}/login`,
