@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { apiFetch, endpoints } from "./config/api";
+import { dnaColors } from "./config/theme";
 import { useAuth } from "./contexts/AuthContext";
 
 export default function Login() {
@@ -54,7 +55,7 @@ export default function Login() {
     >
       <View style={styles.brandContainer}>
         <View style={styles.logoWrapper}>
-          <FontAwesome5 name="truck" size={36} color="#08DF74" />
+          <FontAwesome5 name="truck" size={36} color={dnaColors.accent} />
         </View>
         <Text style={styles.brandTitle}>DNA Transportes</Text>
         <Text style={styles.brandSubtitle}>Painel do Motorista</Text>
@@ -62,7 +63,12 @@ export default function Login() {
 
       <View style={styles.form}>
         <View style={styles.inputContainer}>
-          <FontAwesome5 name="user" size={18} color="#08DF74" style={styles.icon} />
+          <FontAwesome5
+            name="user"
+            size={18}
+            color={dnaColors.accent}
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="Usuário"
@@ -74,7 +80,12 @@ export default function Login() {
         </View>
 
         <View style={styles.inputContainer}>
-          <FontAwesome5 name="lock" size={18} color="#08DF74" style={styles.icon} />
+          <FontAwesome5
+            name="lock"
+            size={18}
+            color={dnaColors.accent}
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="Senha"
@@ -104,7 +115,7 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050B2E",
+    backgroundColor: dnaColors.background,
     paddingHorizontal: 24,
     justifyContent: "center",
   },
@@ -116,27 +127,27 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: "rgba(8, 223, 116, 0.15)",
+    backgroundColor: dnaColors.accentSoft,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
   },
   brandTitle: {
     fontSize: 26,
-    color: "#FFFFFF",
+    color: dnaColors.textPrimary,
     fontWeight: "700",
   },
   brandSubtitle: {
     fontSize: 15,
-    color: "#7D89C6",
+    color: dnaColors.textMuted,
     marginTop: 6,
   },
   form: {
-    backgroundColor: "#0C1540",
+    backgroundColor: dnaColors.backgroundElevated,
     padding: 24,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderColor: dnaColors.border,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
@@ -146,24 +157,24 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#050B2E",
+    backgroundColor: dnaColors.background,
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 56,
     marginBottom: 18,
     borderWidth: 1,
-    borderColor: "rgba(8, 223, 116, 0.25)",
+    borderColor: dnaColors.accentBorder,
   },
   icon: {
     marginRight: 12,
   },
   input: {
     flex: 1,
-    color: "#FFFFFF",
+    color: dnaColors.textPrimary,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#08DF74",
+    backgroundColor: dnaColors.accent,
     height: 56,
     borderRadius: 16,
     alignItems: "center",
@@ -174,7 +185,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: "#050B2E",
+    color: dnaColors.textInverse,
     fontWeight: "700",
     fontSize: 16,
     letterSpacing: 0.6,

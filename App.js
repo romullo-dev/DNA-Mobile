@@ -7,6 +7,7 @@ import Home from "./app/home";
 import RotaDetalhes from "./app/RotaDetalhes";
 import EditarRota from "./app/EditarRota";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { dnaColors } from "./config/theme";
 
 const Stack = createNativeStackNavigator();
 
@@ -14,7 +15,11 @@ const navigationTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#050B2E",
+    primary: dnaColors.accent,
+    background: dnaColors.background,
+    card: dnaColors.background,
+    text: dnaColors.textPrimary,
+    border: dnaColors.border,
   },
 };
 

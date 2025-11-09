@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { dnaColors } from "../config/theme";
 
 export default function DnaHeader({ title, subtitle }) {
   return (
@@ -16,13 +17,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   subtitle: {
-    color: "#7D89C6",
+    color: dnaColors.textMuted,
     fontSize: 14,
     textTransform: "uppercase",
     letterSpacing: 1.2,
   },
   title: {
-    color: "#FFFFFF",
+    color: dnaColors.textPrimary,
     fontSize: 28,
     fontWeight: "bold",
     marginTop: 8,

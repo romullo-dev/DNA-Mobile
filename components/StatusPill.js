@@ -1,17 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
+import { dnaColors } from "../config/theme";
 
 const statusColors = {
-  "Em trânsito": "#08DF74",
-  Finalizado: "#4AA3FF",
-  Ocorrência: "#FF6B6B",
-  "Aguardando liberação": "#FFC857",
-  Cancelado: "#B8336A",
+  "Em trânsito": dnaColors.success,
+  Finalizado: dnaColors.info,
+  Ocorrência: dnaColors.danger,
+  "Aguardando liberação": dnaColors.warning,
+  Cancelado: dnaColors.danger,
 };
 
 export default function StatusPill({ status }) {
-  const color = statusColors[status] ?? "#7D89C6";
+  const color = statusColors[status] ?? dnaColors.textMuted;
   return (
-    <View style={[styles.pill, { backgroundColor: `${color}33` }]}> 
+    <View style={[styles.pill, { backgroundColor: `${color}33` }]}>
       <Text style={[styles.text, { color }]}>{status ?? "Sem status"}</Text>
     </View>
   );

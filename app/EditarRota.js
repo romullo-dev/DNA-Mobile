@@ -27,7 +27,15 @@ const STATUS_MAP = {
 export default function EditarRota({ route, navigation }) {
   const { rota, onUpdate } = route.params;
   const [statusOpen, setStatusOpen] = useState(false);
-  const statusOptions = useMemo(() => STATUS_MAP[rota.tipo] ?? STATUS_MAP.Entrega, [rota.tipo]);
+
+  // 🔤 Normaliza o tipo para evitar erro de case (coleta, Coleta, etc.)
+  const tipoNormalizado =
+    rota.tipo?.charAt(0).toUpperCase() + rota.tipo?.slice(1).toLowerCase();
+
+  const statusOptions = useMemo(
+    () => STATUS_MAP[tipoNormalizado] ?? STATUS_MAP.Entrega,
+    [tipoNormalizado]
+  );
 
   const statusInicial = useMemo(() => {
     const atual = rota.pedidos?.[0]?.status ?? rota.historicos?.[0]?.status;
@@ -36,7 +44,9 @@ export default function EditarRota({ route, navigation }) {
   }, [rota.historicos, rota.pedidos, statusOptions]);
 
   const [status, setStatus] = useState(statusInicial);
-  const [observacao, setObservacao] = useState(rota.historicos?.[0]?.observacao ?? "");
+  const [observacao, setObservacao] = useState(
+    rota.historicos?.[0]?.observacao ?? ""
+  );
   const [foto, setFoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,17 +60,20 @@ export default function EditarRota({ route, navigation }) {
         : ImagePicker.requestMediaLibraryPermissionsAsync());
 
       if (!permission.granted) {
-        Alert.alert("Permissão necessária", "Conceda acesso à câmera ou galeria para anexar imagens.");
+        Alert.alert(
+          "Permissão necessária",
+          "Conceda acesso à câmera ou galeria para anexar imagens."
+        );
         return;
       }
 
       const result = await (fromCamera
         ? ImagePicker.launchCameraAsync({
-            mediaTypes: [ImagePicker.MediaType.Image],
+            mediaTypes: ["images"], // novo formato compatível
             quality: 0.7,
           })
         : ImagePicker.launchImageLibraryAsync({
-            mediaTypes: [ImagePicker.MediaType.Image],
+            mediaTypes: ["images"],
             quality: 0.7,
           }));
 
@@ -80,10 +93,14 @@ export default function EditarRota({ route, navigation }) {
         onPress: async () => {
           try {
             setSubmitting(true);
+
             const formData = new FormData();
             formData.append("rotas_id_rotas", String(rota.id_rotas));
-            formData.append("pedido_id_pedido", String(rota.pedidos?.[0]?.id_pedido ?? ""));
-            formData.append("tipo", rota.tipo ?? "Entrega");
+            formData.append(
+              "pedido_id_pedido",
+              String(rota.pedidos?.[0]?.id_pedido ?? "")
+            );
+            formData.append("tipo", tipoNormalizado ?? "Entrega");
             formData.append("status", status);
             formData.append("observacao", observacao);
 
@@ -103,7 +120,7 @@ export default function EditarRota({ route, navigation }) {
             console.log("📤 Enviando dados:", {
               pedido_id_pedido: rota.pedidos?.[0]?.id_pedido,
               rotas_id_rotas: rota.id_rotas,
-              tipo: rota.tipo,
+              tipo: tipoNormalizado,
               status,
               observacao,
               foto: !!foto,
@@ -138,14 +155,19 @@ export default function EditarRota({ route, navigation }) {
                 observacao,
                 foto: foto ? foto.uri.split("/").pop() : null,
               };
+
               const novaRota = {
                 ...rota,
                 historicos: [...(rota.historicos || []), novoHistorico],
               };
+
               onUpdate(novaRota);
             }
 
-            Alert.alert("✅ Sucesso", data.message ?? "Rota atualizada com sucesso!");
+            Alert.alert(
+              "✅ Sucesso",
+              data.message ?? "Rota atualizada com sucesso!"
+            );
             navigation.goBack();
           } catch (error) {
             console.error("❌ Erro ao salvar rota:", error);
@@ -171,7 +193,10 @@ export default function EditarRota({ route, navigation }) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.innerContainer}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => navigation.goBack()}
+            >
               <FontAwesome5 name="times" size={18} color="#FFFFFF" />
             </TouchableOpacity>
 
@@ -184,10 +209,14 @@ export default function EditarRota({ route, navigation }) {
             <DropDownPicker
               open={statusOpen}
               value={status}
-              items={statusOptions.map((option) => ({ label: option, value: option }))}
+              items={statusOptions.map((option) => ({
+                label: option,
+                value: option,
+              }))}
               setOpen={setStatusOpen}
               setValue={(callback) => {
-                const nextValue = typeof callback === "function" ? callback(status) : callback;
+                const nextValue =
+                  typeof callback === "function" ? callback(status) : callback;
                 setStatus(nextValue);
               }}
               style={styles.dropdown}
@@ -211,7 +240,10 @@ export default function EditarRota({ route, navigation }) {
             {foto ? (
               <View style={styles.previewContainer}>
                 <Image source={{ uri: foto.uri }} style={styles.preview} />
-                <TouchableOpacity style={styles.clearButton} onPress={() => setFoto(null)}>
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => setFoto(null)}
+                >
                   <FontAwesome5 name="trash" size={14} color="#FF6B6B" />
                   <Text style={styles.clearButtonText}>Remover</Text>
                 </TouchableOpacity>
@@ -223,18 +255,27 @@ export default function EditarRota({ route, navigation }) {
             )}
 
             <View style={styles.photoActions}>
-              <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(false)}>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => pickImage(false)}
+              >
                 <FontAwesome5 name="images" size={16} color="#08DF74" />
                 <Text style={styles.secondaryButtonText}>Galeria</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.secondaryButton} onPress={() => pickImage(true)}>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() => pickImage(true)}
+              >
                 <FontAwesome5 name="camera" size={16} color="#08DF74" />
                 <Text style={styles.secondaryButtonText}>Câmera</Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.primaryButton, submitting && styles.primaryButtonDisabled]}
+              style={[
+                styles.primaryButton,
+                submitting && styles.primaryButtonDisabled,
+              ]}
               onPress={handleSalvar}
               disabled={submitting}
             >

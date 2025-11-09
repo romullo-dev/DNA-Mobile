@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { dnaColors } from "../config/theme";
 import { formatDateTime } from "../utils/format";
 
 function getUltimoHistorico(historicos = []) {
@@ -10,27 +11,32 @@ function getUltimoHistorico(historicos = []) {
 
 function RouteCard({ rota, onPress }) {
   const ultimoHistorico = getUltimoHistorico(rota.historicos);
+  const tituloRota = useMemo(() => {
+    const texto = rota.tipo ?? "Rota";
+    if (!texto) return "Rota";
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+  }, [rota.tipo]);
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.headerRow}>
-        <FontAwesome5 name="route" size={18} color="#08DF74" />
-        <Text style={styles.cardTitle}>{rota.tipo}</Text>
+        <FontAwesome5 name="route" size={18} color={dnaColors.accent} />
+        <Text style={styles.cardTitle}>{tituloRota}</Text>
         <View style={[styles.badge, styles.statusBadge]}>
           <Text style={styles.badgeText}>{ultimoHistorico?.status ?? "Sem status"}</Text>
         </View>
       </View>
 
       <View style={styles.row}>
-        <FontAwesome5 name="warehouse" size={16} color="#B7C1FF" />
+        <FontAwesome5 name="warehouse" size={16} color={dnaColors.iconHighlight} />
         <Text style={styles.rowText}>Origem: {rota.origem?.nome ?? "-"}</Text>
       </View>
       <View style={styles.row}>
-        <FontAwesome5 name="map-marker-alt" size={16} color="#FFC857" />
+        <FontAwesome5 name="map-marker-alt" size={16} color={dnaColors.warning} />
         <Text style={styles.rowText}>Destino: {rota.destino?.nome ?? "-"}</Text>
       </View>
       <View style={styles.row}>
-        <FontAwesome5 name="clock" size={16} color="#9DA5D1" />
+        <FontAwesome5 name="clock" size={16} color={dnaColors.textMuted} />
         <Text style={styles.rowText}>Previsão: {formatDateTime(rota.previsao)}</Text>
       </View>
     </TouchableOpacity>
@@ -39,12 +45,12 @@ function RouteCard({ rota, onPress }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#10194E",
+    backgroundColor: dnaColors.card,
     padding: 18,
     borderRadius: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.08)",
+    borderColor: dnaColors.border,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flex: 1,
-    color: "#FFFFFF",
+    color: dnaColors.textPrimary,
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 0.3,
@@ -70,10 +76,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   statusBadge: {
-    backgroundColor: "rgba(8, 223, 116, 0.12)",
+    backgroundColor: dnaColors.accentMuted,
   },
   badgeText: {
-    color: "#08DF74",
+    color: dnaColors.accent,
     fontWeight: "600",
     fontSize: 12,
   },
@@ -84,7 +90,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   rowText: {
-    color: "#E2E6FF",
+    color: dnaColors.textSecondary,
     fontSize: 15,
     flex: 1,
   },
