@@ -88,7 +88,6 @@ export default function Home({ navigation }) {
   // 🔹 Status válidos para exibição
   const statusPermitidos = [
     "Aguardando coleta",
-    'Aguardando coleta',
     "Em processo de coleta",
     "Aguardando transferência",
     "Em processo de transferência",
@@ -97,29 +96,23 @@ export default function Home({ navigation }) {
   ];
 
   // 🔹 Filtra rotas apenas do motorista logado E com último status válido
-    // 🔹 Filtra rotas apenas do motorista logado E com último status válido
   const rotasFiltradas = useMemo(() => {
     if (!user || !rotas?.length) return [];
 
     return rotas.filter((rota) => {
-      // ⚙️ Confere se a rota pertence ao motorista logado
       const motoristaId = rota.motorista?.usuario?.id_usuario;
       const usuarioId = Number(user.id_usuario);
       if (motoristaId !== usuarioId) return false;
 
-      // ⚙️ Verifica o último status
       const historicos = rota.historicos ?? [];
       if (historicos.length === 0) return false;
 
-const ultimoStatus = [...historicos]
-  .sort((a, b) => new Date(b.data) - new Date(a.data))[0]?.status?.trim();
+      const ultimoStatus = [...historicos]
+        .sort((a, b) => new Date(b.data) - new Date(a.data))[0]?.status?.trim();
 
-      // ✅ Exibe só se for do motorista logado e status válido
       return statusPermitidos.includes(ultimoStatus);
     });
   }, [rotas, user]);
-
-
 
   // 🔍 Debug (pode remover depois)
   useEffect(() => {
@@ -148,12 +141,17 @@ const ultimoStatus = [...historicos]
         }}
       >
         {/* 🔝 Cabeçalho */}
-        <DnaHeader title="Minhas Rotas" subtitle={headerSubtitle} />
+        <DnaHeader
+          title="Minhas Rotas"
+          subtitle={headerSubtitle}
+          titleStyle={styles.headerTitle}
+          subtitleStyle={styles.headerSubtitle}
+        />
 
         {/* 🔸 Toolbar superior */}
         <View style={styles.toolbar}>
           <View style={styles.infoPill}>
-            <FontAwesome5 name="clock" size={14} color={dnaColors.textMuted} />
+            <FontAwesome5 name="clock" size={16} color={dnaColors.accent} />
             <Text style={styles.infoText}>
               {rotasFiltradas.length} rotas em andamento
             </Text>
@@ -200,14 +198,26 @@ const ultimoStatus = [...historicos]
   );
 }
 
-// 🎨 Estilos
+// 🎨 Estilos aprimorados (visual mais limpo e fontes maiores)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: dnaColors.background,
   },
   scrollContent: {
-    padding: 24,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 60,
+  },
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: dnaColors.textPrimary,
+  },
+  headerSubtitle: {
+    fontSize: 18,
+    color: dnaColors.textSecondary,
+    marginBottom: 10,
   },
   toolbar: {
     flexDirection: "row",
@@ -218,44 +228,51 @@ const styles = StyleSheet.create({
   infoPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
     backgroundColor: dnaColors.backgroundElevated,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 30,
+    gap: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   infoText: {
     color: dnaColors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: "500",
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: "rgba(255, 107, 107, 0.12)",
-    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    backgroundColor: "rgba(255, 99, 99, 0.15)",
+    borderRadius: 30,
   },
   logoutText: {
     color: dnaColors.danger,
     fontWeight: "600",
+    fontSize: 15,
   },
   loaderContainer: {
-    paddingVertical: 48,
+    paddingVertical: 50,
     alignItems: "center",
     gap: 12,
   },
   loaderText: {
     color: dnaColors.textSecondary,
+    fontSize: 16,
   },
   loadingMoreContainer: {
-    marginTop: 12,
+    marginTop: 20,
     alignItems: "center",
     gap: 8,
     paddingBottom: 32,
   },
   loadingMoreText: {
     color: dnaColors.textMuted,
+    fontSize: 14,
   },
 });

@@ -236,6 +236,10 @@ export default function EditarRota({ route, navigation }) {
               multiline
             />
 
+
+
+
+
             <Text style={styles.label}>Foto</Text>
             {foto ? (
               <View style={styles.previewContainer}>
