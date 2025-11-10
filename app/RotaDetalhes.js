@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context"; // ✅ Importação correta
+import { useSafeAreaInsets } from "react-native-safe-area-context"; 
 import StatusPill from "../components/StatusPill";
 import { dnaColors } from "../config/theme";
 import { formatDate, formatDateTime } from "../utils/format";
@@ -15,7 +15,7 @@ import { formatDate, formatDateTime } from "../utils/format";
 export default function RotaDetalhes({ route, navigation }) {
   const { rota: rotaInicial, onRotaUpdate } = route.params;
   const [rotaAtual, setRotaAtual] = useState(rotaInicial);
-  const insets = useSafeAreaInsets(); // ✅ Calcula margens seguras
+  const insets = useSafeAreaInsets(); 
 
   const historicosOrdenados = useMemo(
     () => [...(rotaAtual.historicos ?? [])].sort((a, b) => (a.data < b.data ? 1 : -1)),
@@ -35,8 +35,8 @@ export default function RotaDetalhes({ route, navigation }) {
       style={[
         styles.container,
         {
-          paddingTop: insets.top + 8, // 👈 respeita notch e adiciona espaço extra
-          paddingBottom: insets.bottom + 24, // 👈 ajusta botão inferior
+          paddingTop: insets.top + 8, 
+          paddingBottom: insets.bottom + 24, 
         },
       ]}
     >
@@ -44,13 +44,13 @@ export default function RotaDetalhes({ route, navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 🔙 Botão Voltar */}
+    
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <FontAwesome5 name="arrow-left" size={16} color={dnaColors.textPrimary} />
           <Text style={styles.backButtonText}>Voltar</Text>
         </TouchableOpacity>
 
-        {/* 🏷 Cabeçalho */}
+        
         <View style={styles.headerCard}>
           <View>
             <Text style={styles.headerLabel}>Rota #{rotaAtual.id_rotas}</Text>
@@ -59,7 +59,7 @@ export default function RotaDetalhes({ route, navigation }) {
           <StatusPill status={pedidoPrincipal?.status ?? historicosOrdenados[0]?.status} />
         </View>
 
-        {/* 🧭 Informações */}
+        
         <View style={styles.infoGrid}>
           <InfoItem icon="calendar-alt" label="Início" value={formatDate(rotaAtual.data_inicio)} />
           <InfoItem icon="clock" label="Previsão" value={formatDate(rotaAtual.previsao)} />
@@ -67,7 +67,7 @@ export default function RotaDetalhes({ route, navigation }) {
           <InfoItem icon="truck" label="Veículo" value={rotaAtual.veiculo?.placa ?? "Não informado"} />
         </View>
 
-        {/* 🏢 Paradas */}
+        
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Paradas</Text>
           <View style={styles.listRow}>
@@ -84,7 +84,7 @@ export default function RotaDetalhes({ route, navigation }) {
           </View>
         </View>
 
-        {/* 🕓 Histórico */}
+        
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Histórico</Text>
           {historicosOrdenados.length === 0 ? (
@@ -108,11 +108,10 @@ export default function RotaDetalhes({ route, navigation }) {
         </View>
       </ScrollView>
 
-      {/* ✏️ Botão principal fixo */}
       <TouchableOpacity
         style={[
           styles.primaryButton,
-          { bottom: insets.bottom + 16 }, // 👈 ajusta altura no iPhone
+          { bottom: insets.bottom + 16 }, 
         ]}
         onPress={() =>
           navigation.navigate("EditarRota", {
