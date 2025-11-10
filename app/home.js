@@ -25,8 +25,7 @@ export default function Home({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-
-  // 🔹 Carrega rotas da API
+  
   const fetchRotas = useCallback(
     async (page = 1, shouldReplace = false) => {
       try {
@@ -49,33 +48,28 @@ export default function Home({ navigation }) {
     []
   );
 
-  // 🔹 Atualiza ao entrar na tela
   useFocusEffect(
     useCallback(() => {
       fetchRotas(1, true);
     }, [fetchRotas])
   );
 
-  // 🔹 Atualiza ao puxar pra baixo
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchRotas(1, true).finally(() => setRefreshing(false));
   }, [fetchRotas]);
 
-  // 🔹 Paginação infinita
   const loadMore = useCallback(() => {
     if (loadingMore || loading) return;
     if (meta.current_page >= meta.last_page) return;
     fetchRotas(meta.current_page + 1);
   }, [fetchRotas, loading, loadingMore, meta]);
 
-  // 🔹 Saudação no topo
   const headerSubtitle = useMemo(() => {
     if (!user) return "";
     return `Olá, ${user.nome?.split(" ")[0] ?? user.user}!`;
   }, [user]);
 
-  // 🔹 Atualiza rota localmente ao editar
   const handleRotaAtualizada = useCallback((rotaAtualizada) => {
     if (!rotaAtualizada?.id_rotas) return;
     setRotas((prev) =>
@@ -85,7 +79,6 @@ export default function Home({ navigation }) {
     );
   }, []);
 
-  // 🔹 Status válidos para exibição
   const statusPermitidos = [
     "Aguardando coleta",
     "Em processo de coleta",
@@ -95,7 +88,6 @@ export default function Home({ navigation }) {
     "Em rota de entrega",
   ];
 
-  // 🔹 Filtra rotas apenas do motorista logado E com último status válido
   const rotasFiltradas = useMemo(() => {
     if (!user || !rotas?.length) return [];
 
@@ -114,7 +106,6 @@ export default function Home({ navigation }) {
     });
   }, [rotas, user]);
 
-  // 🔍 Debug (pode remover depois)
   useEffect(() => {
     const ids = rotas.map((r) => r.motorista?.usuario?.id_usuario);
     console.log("👤 Usuário logado:", user?.id_usuario);
@@ -140,7 +131,6 @@ export default function Home({ navigation }) {
           if (distanceFromBottom < 200) loadMore();
         }}
       >
-        {/* 🔝 Cabeçalho */}
         <DnaHeader
           title="Minhas Rotas"
           subtitle={headerSubtitle}
@@ -148,7 +138,6 @@ export default function Home({ navigation }) {
           subtitleStyle={styles.headerSubtitle}
         />
 
-        {/* 🔸 Toolbar superior */}
         <View style={styles.toolbar}>
           <View style={styles.infoPill}>
             <FontAwesome5 name="clock" size={16} color={dnaColors.accent} />
@@ -163,7 +152,6 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* 🔹 Lista de rotas */}
         {loading && !refreshing ? (
           <View style={styles.loaderContainer}>
             <ActivityIndicator color={dnaColors.accent} size="large" />
@@ -186,7 +174,6 @@ export default function Home({ navigation }) {
           ))
         )}
 
-        {/* 🔄 Paginação */}
         {loadingMore && (
           <View style={styles.loadingMoreContainer}>
             <ActivityIndicator color={dnaColors.textMuted} />
@@ -198,7 +185,6 @@ export default function Home({ navigation }) {
   );
 }
 
-// 🎨 Estilos aprimorados (visual mais limpo e fontes maiores)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
