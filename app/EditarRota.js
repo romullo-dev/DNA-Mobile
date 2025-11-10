@@ -17,7 +17,6 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { endpoints } from "../config/api";
 
-// 🔹 Mapa de status por tipo de rota
 const STATUS_MAP = {
   Coleta: ["Em trânsito", "Finalizado", "Ocorrência"],
   Transferencia: ["Em trânsito", "Finalizado", "Ocorrência"],
@@ -28,7 +27,6 @@ export default function EditarRota({ route, navigation }) {
   const { rota, onUpdate } = route.params;
   const [statusOpen, setStatusOpen] = useState(false);
 
-  // 🔤 Normaliza o tipo para evitar erro de case (coleta, Coleta, etc.)
   const tipoNormalizado =
     rota.tipo?.charAt(0).toUpperCase() + rota.tipo?.slice(1).toLowerCase();
 
@@ -52,7 +50,6 @@ export default function EditarRota({ route, navigation }) {
 
   useEffect(() => setStatus(statusInicial), [statusInicial]);
 
-  // 📸 Selecionar imagem
   const pickImage = async (fromCamera = false) => {
     try {
       const permission = await (fromCamera
@@ -69,7 +66,7 @@ export default function EditarRota({ route, navigation }) {
 
       const result = await (fromCamera
         ? ImagePicker.launchCameraAsync({
-            mediaTypes: ["images"], // novo formato compatível
+            mediaTypes: ["images"], 
             quality: 0.7,
           })
         : ImagePicker.launchImageLibraryAsync({
@@ -84,7 +81,6 @@ export default function EditarRota({ route, navigation }) {
     }
   };
 
-  // 💾 Enviar formulário
   const handleSalvar = async () => {
     Alert.alert("Confirmar atualização", "Deseja salvar as alterações da rota?", [
       { text: "Cancelar", style: "cancel" },
@@ -146,7 +142,6 @@ export default function EditarRota({ route, navigation }) {
 
             console.log("✅ Resposta da API:", data);
 
-            // 🔄 Atualiza a rota no retorno da tela anterior
             if (onUpdate) {
               const novoHistorico = {
                 id_historico: Date.now(),
